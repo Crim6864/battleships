@@ -1,62 +1,97 @@
-# Your code goes here.
-# You can delete these comments, but do not change the name of this file
-# Write your code to expect a terminal of 80 characters wide and 24 rows high
-
 import random
 
-# Initialize the board
-board_size = 10
-board = [['O' for _ in range(board_size)] for _ in range(board_size)]
+class BattleshipGame:
+    def __init__(self):
+        self.board = [['O' for _ in range(10)] for _ in range(10)]
+        self.ships = {'Aircraft Carrier': 5, 'Battleship': 4, 'Submarine': 3, 'Destroyer': 3, 'Patrol Boat': 2}
+        self.remaining_ships = len(self.ships)
+        self.place_ships()
+        self.attempts = 0
 
-# Function to print the board
-def print_board(board):
-    for row in board:
-        print(" ".join(row))
+    def place_ships(self):
+        for ship, length in self.ships.items():
+            while True:
+                direction = random.choice(['horizontal', 'vertical'])
+                if direction == 'horizontal':
+                    x = random.randint(0, 9)
+                    y = random.randint(0, 9 - length)
+                    if all(self.board[x][y + i] == 'O' for i in range(length)):
+                        for i in range(length):
+                            self.board[x][y + i] = ship[0]
+                        break
+                else:
+                    x = random.randint(0, 9 - length)
+                    y = random.randint(0, 9)
+                    if all(self.board[x + i][y] == 'O' for i in range(length)):
+                        for i in range(length):
+                            self.board[x + i][y] = ship[0]
+                        break
 
-# Function to place ships randomly on the board
-def place_ships(board, num_ships):
-    for _ in range(num_ships):
-        while True:
-            ship_row = random.randint(0, board_size - 1)
-            ship_col = random.randint(0, board_size - 1)
-            if board[ship_row][ship_col] != 'S':
-                board[ship_row][ship_col] = 'S'
-                break
+    def print_board(self, show_ships=False):
+        print("  0 1 2 3 4 5 6 7 8 9")
+        for i, row in enumerate(self.board):
+            print(i, end=' ')
+            for cell in row:
+                if cell != 'X' or show_ships:
+                    print(cell, end=' ')
+                else:
+                    print('O', end=' ')
+            print()
 
-# Function to check if the player's guess is correct
-def check_guess(guess_row, guess_col, board):
-    if board[guess_row][guess_col] == 'S':
-        print("Congratulations! You sunk my battleship!")
-        board[guess_row][guess_col] = 'X'
-        return True
-    else:
-        if (guess_row < 0 or guess_row >= board_size) or (guess_col < 0 or guess_col >= board_size):
-            print("Oops, that's not even in the ocean.")
-        elif board[guess_row][guess_col] == 'X':
-            print("You've already guessed that one.")
-        else:
-            print("You missed my battleship!")
-            board[guess_row][guess_col] = 'X'
-        return False
+    def play(self):
+        while self.remaining_ships > 0:
+            self.print_board()
+            guess = input("Enter your guess (row column): ").split()
+            if len(guess) != 2 or not guess[0].isdigit() or not guess[1].isdigit():
+                print("Invalid input! Please enter row and column numbers.")
+                continue
+            x, y = map(int, guess)
+            if x < 0 or x > 9 or y < 0 or y > 9:
+                print("Invalid input! Row and column numbers must be between 0 and 9.")
+                continue
+            if self.board[x][y] == 'X':
+                print("You already guessed this position.")
+                continue
+            if self.board[x][y] != 'O':
+                print("Hit!")
+                self.board[x][y] = 'X'
+                self.attempts += 1
+                ship_hit = self.board[x][y]
+                self.ships[ship_hit] -= 1
+                if self.ships[ship_hit] == 0:
+                    print(f"You sunk the {ship_hit}!")
+                    self.remaining_ships -= 1
+                if self.remaining_ships == 0:
+                    print("Congratulations! You sunk all the ships!")
+                    break
+            else:
+                print("Miss!")
+                self.board[x][y] = 'X'
+                self.attempts += 1
+        print(f"Total attempts: {self.attempts}")
 
-# Main game loop
-def battleship_game():
-    print("Welcome to Battleship!")
-    print_board(board)
-    num_ships = 5
-    place_ships(board, num_ships)
-    turns = 0
+def update_leaderboard(player, attempts, leaderboard):
+    leaderboard.append((player, attempts))
+    leaderboard.sort(key=lambda x: x[1])  # Sort by attempts
+    if len(leaderboard) > 10:
+        leaderboard.pop()
+
+def display_leaderboard(leaderboard):
+    print("Leaderboard:")
+    for i, (player, attempts) in enumerate(leaderboard):
+        print(f"{i+1}. {player}: {attempts} attempts")
+
+def main():
+    leaderboard = []
     while True:
-        print("Turn", turns + 1)
-        guess_row = int(input("Guess Row (0-" + str(board_size - 1) + "): "))
-        guess_col = int(input("Guess Col (0-" + str(board_size - 1) + "): "))
-        if check_guess(guess_row, guess_col, board):
-            print_board(board)
+        name = input("Enter your name: ")
+        game = BattleshipGame()
+        game.play()
+        update_leaderboard(name, game.attempts, leaderboard)
+        display_leaderboard(leaderboard)
+        play_again = input("Do you want to play again? (yes/no): ")
+        if play_again.lower() != 'yes':
             break
-        else:
-            print_board(board)
-            turns += 1
-    print("Game Over! You took", turns + 1, "turns.")
 
-# Start the game
-battleship_game()
+if __name__ == "__main__":
+    main()
