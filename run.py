@@ -49,15 +49,28 @@ class BattleshipGame:
                     print('O', end=' ')
             print()
 
+    def valid_guess(self, x, y):
+        if not (0 <= x < 10 and 0 <= y < 10):
+            print("Invalid input! Row and column numbers must be between 0 and 9.")
+            return False
+        if self.board[x][y] == 'X':
+            print("You already guessed this position.")
+            return False
+        return True
+
     def play(self):
         while self.remaining_ships > 0:
             self.print_board()
-            guess = self.get_guess()
-            x, y = guess
-            if self.valid_guess(x, y):
-                self.handle_guess(x, y)
-            else:
-                print("Invalid guess! Please try again.")
+            guess = input("Enter your guess (row column): ").split()
+            if len(guess) != 2 or not guess[0].isdigit() or not guess[1].isdigit():
+                print("Invalid input! Please enter row and column numbers.")
+                continue
+            x, y = map(int, guess)
+            if not self.valid_guess(x, y):
+                continue
+            self.handle_guess(x, y)
+
+        print(f"Total attempts: {self.attempts}")
 
     def get_guess(self):
         guess = input("Enter your guess (row column): ").split()
