@@ -65,25 +65,24 @@ class BattleshipGame:
             return (-1, -1)
         return map(int, guess)
 
-    def valid_guess(self, x, y):
-        return 0 <= x <= 9 and 0 <= y <= 9 and self.board[x][y] != 'X'
-
-    def handle_guess(self, x, y):
-        if self.board[x][y] != 'O':
-            print("Hit!")
-            self.board[x][y] = 'X'
-            self.attempts += 1
-            ship_hit = self.board[x][y]
+def handle_guess(self, x, y):
+    if self.board[x][y] != 'O':
+        print("Hit!")
+        self.board[x][y] = 'X'
+        self.attempts += 1
+        ship_hit = self.board[x][y]
+        if ship_hit in self.ships:
             self.ships[ship_hit] -= 1
             if self.ships[ship_hit] == 0:
                 print(f"You sunk the {ship_hit}!")
                 self.remaining_ships -= 1
+                del self.ships[ship_hit]  # Remove the sunk ship from the dictionary
             if self.remaining_ships == 0:
                 print("Congratulations! You sunk all the ships!")
-        else:
-            print("Miss!")
-            self.board[x][y] = 'X'
-            self.attempts += 1
+    else:
+        print("Miss!")
+        self.board[x][y] = 'X'
+        self.attempts += 1
 
 def update_leaderboard(player, attempts, leaderboard):
     leaderboard.append((player, attempts))
