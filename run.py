@@ -49,6 +49,25 @@ class BattleshipGame:
                     print('O', end=' ')
             print()
 
+    def handle_guess(self, x, y):
+        if self.board[x][y] != 'O':
+            print("Hit!")
+            self.board[x][y] = 'X'
+            self.attempts += 1
+            ship_hit = self.board[x][y]
+            if ship_hit in self.ships:
+                self.ships[ship_hit] -= 1
+                if self.ships[ship_hit] == 0:
+                    print(f"You sunk the {ship_hit}!")
+                    self.remaining_ships -= 1
+                    del self.ships[ship_hit]  # Remove the sunk ship from the dictionary
+                if self.remaining_ships == 0:
+                    print("Congratulations! You sunk all the ships!")
+        else:
+            print("Miss!")
+            self.board[x][y] = 'X'
+            self.attempts += 1
+
     def valid_guess(self, x, y):
         if not (0 <= x < 10 and 0 <= y < 10):
             print("Invalid input! Row and column numbers must be between 0 and 9.")
