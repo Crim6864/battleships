@@ -2,7 +2,7 @@
 Hello and welcome to my third project at Code Institute. This is a python based project.
 
 
-# Wrecking Ball Game
+# Battleship Game
 ### Project Description
 This project was made for fun and made me realise how much you can learn from google.
 
