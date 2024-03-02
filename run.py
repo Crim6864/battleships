@@ -12,20 +12,31 @@ class BattleshipGame:
         for ship, length in self.ships.items():
             while True:
                 direction = random.choice(['horizontal', 'vertical'])
-                if direction == 'horizontal':
-                    x = random.randint(0, 9)
-                    y = random.randint(0, 9 - length)
-                    if all(self.board[x][y + i] == 'O' for i in range(length)):
-                        for i in range(length):
-                            self.board[x][y + i] = ship[0]
-                        break
-                else:
-                    x = random.randint(0, 9 - length)
-                    y = random.randint(0, 9)
-                    if all(self.board[x + i][y] == 'O' for i in range(length)):
-                        for i in range(length):
-                            self.board[x + i][y] = ship[0]
-                        break
+                if self.can_place_ship(direction, length):
+                    self.place_ship(direction, length, ship)
+                    break
+
+    def can_place_ship(self, direction, length):
+        if direction == 'horizontal':
+            x = random.randint(0, 9)
+            y = random.randint(0, 9 - length)
+            return all(self.board[x][y + i] == 'O' for i in range(length))
+        else:
+            x = random.randint(0, 9 - length)
+            y = random.randint(0, 9)
+            return all(self.board[x + i][y] == 'O' for i in range(length))
+
+    def place_ship(self, direction, length, ship):
+        if direction == 'horizontal':
+            x = random.randint(0, 9)
+            y = random.randint(0, 9 - length)
+            for i in range(length):
+                self.board[x][y + i] = ship[0]
+        else:
+            x = random.randint(0, 9 - length)
+            y = random.randint(0, 9)
+            for i in range(length):
+                self.board[x + i][y] = ship[0]
 
     def print_board(self, show_ships=False):
         print("  0 1 2 3 4 5 6 7 8 9")
@@ -41,34 +52,38 @@ class BattleshipGame:
     def play(self):
         while self.remaining_ships > 0:
             self.print_board()
-            guess = input("Enter your guess (row column): ").split()
-            if len(guess) != 2 or not guess[0].isdigit() or not guess[1].isdigit():
-                print("Invalid input! Please enter row and column numbers.")
-                continue
-            x, y = map(int, guess)
-            if x < 0 or x > 9 or y < 0 or y > 9:
-                print("Invalid input! Row and column numbers must be between 0 and 9.")
-                continue
-            if self.board[x][y] == 'X':
-                print("You already guessed this position.")
-                continue
-            if self.board[x][y] != 'O':
-                print("Hit!")
-                self.board[x][y] = 'X'
-                self.attempts += 1
-                ship_hit = self.board[x][y]
-                self.ships[ship_hit] -= 1
-                if self.ships[ship_hit] == 0:
-                    print(f"You sunk the {ship_hit}!")
-                    self.remaining_ships -= 1
-                if self.remaining_ships == 0:
-                    print("Congratulations! You sunk all the ships!")
-                    break
+            guess = self.get_guess()
+            x, y = guess
+            if self.valid_guess(x, y):
+                self.handle_guess(x, y)
             else:
-                print("Miss!")
-                self.board[x][y] = 'X'
-                self.attempts += 1
-        print(f"Total attempts: {self.attempts}")
+                print("Invalid guess! Please try again.")
+
+    def get_guess(self):
+        guess = input("Enter your guess (row column): ").split()
+        if len(guess) != 2 or not guess[0].isdigit() or not guess[1].isdigit():
+            return (-1, -1)
+        return map(int, guess)
+
+    def valid_guess(self, x, y):
+        return 0 <= x <= 9 and 0 <= y <= 9 and self.board[x][y] != 'X'
+
+    def handle_guess(self, x, y):
+        if self.board[x][y] != 'O':
+            print("Hit!")
+            self.board[x][y] = 'X'
+            self.attempts += 1
+            ship_hit = self.board[x][y]
+            self.ships[ship_hit] -= 1
+            if self.ships[ship_hit] == 0:
+                print(f"You sunk the {ship_hit}!")
+                self.remaining_ships -= 1
+            if self.remaining_ships == 0:
+                print("Congratulations! You sunk all the ships!")
+        else:
+            print("Miss!")
+            self.board[x][y] = 'X'
+            self.attempts += 1
 
 def update_leaderboard(player, attempts, leaderboard):
     leaderboard.append((player, attempts))
@@ -84,15 +99,14 @@ def display_leaderboard(leaderboard):
 def main():
     leaderboard = []
     while True:
-        try:
-            name = input("Enter your name: ")
-            game = BattleshipGame()
-            game.play()
-            update_leaderboard(name, game.attempts, leaderboard)
-            display_leaderboard(leaderboard)
-            play_again = input("Do you want to play again? (yes/no): ")
-            if play_again.lower() != 'yes':
-                break
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
-            print("Please try again or contact support if the issue persists.")
+        name = input("Enter your name: ")
+        game = BattleshipGame()
+        game.play()
+        update_leaderboard(name, game.attempts, leaderboard)
+        display_leaderboard(leaderboard)
+        play_again = input("Do you want to play again? (yes/no): ")
+        if play_again.lower() != 'yes':
+            break
+
+if __name__ == "__main__":
+    main()
