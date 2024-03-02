@@ -84,14 +84,15 @@ def display_leaderboard(leaderboard):
 def main():
     leaderboard = []
     while True:
-        name = input("Enter your name: ")
-        game = BattleshipGame()
-        game.play()
-        update_leaderboard(name, game.attempts, leaderboard)
-        display_leaderboard(leaderboard)
-        play_again = input("Do you want to play again? (yes/no): ")
-        if play_again.lower() != 'yes':
-            break
-
-if __name__ == "__main__":
-    main()
+        try:
+            name = input("Enter your name: ")
+            game = BattleshipGame()
+            game.play()
+            update_leaderboard(name, game.attempts, leaderboard)
+            display_leaderboard(leaderboard)
+            play_again = input("Do you want to play again? (yes/no): ")
+            if play_again.lower() != 'yes':
+                break
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            print("Please try again or contact support if the issue persists.")
