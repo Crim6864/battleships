@@ -22,16 +22,13 @@ While the current version of the project provides a complete Battleship gaming e
 ## Validator Testing
 
 #Check 1
-#Handle Hit Method: The vulnerability in the handle_hit method was addressed by first retrieving the ship being hit and then updating the board. This prevents any inconsistencies that may arise from updating the board before identifying the ship.
+**Handle Hit Method**: The vulnerability in the handle_hit method was addressed by first retrieving the ship being hit and then updating the board. This prevents any inconsistencies that may arise from updating the board before identifying the ship.
 
-#Invalid Input Checks: 
-Unnecessary exception handling in the handle_guess method was removed, and conditions for valid inputs were directly checked within the method. This simplifies the code and improves its clarity.
+**Invalid Input Checks**: Unnecessary exception handling in the handle_guess method was removed, and conditions for valid inputs were directly checked within the method. This simplifies the code and improves its clarity.
 
-#Bounds Checking: 
-A vulnerability related to out-of-bounds access in the handle_guess method was fixed by directly checking the bounds before accessing the board. This ensures that invalid input coordinates do not lead to out-of-bounds access errors.
+**Bounds Checking**: A vulnerability related to out-of-bounds access in the handle_guess method was fixed by directly checking the bounds before accessing the board. This ensures that invalid input coordinates do not lead to out-of-bounds access errors.
 
-#Overall Review: 
-The code was thoroughly reviewed to enhance input validation and prevent errors caused by incorrect user inputs. By addressing these vulnerabilities, the code becomes more robust and less prone to unexpected behavior.
+**Overall Review**: The code was thoroughly reviewed to enhance input validation and prevent errors caused by incorrect user inputs. By addressing these vulnerabilities, the code becomes more robust and less prone to unexpected behavior.
 [here](https://www.clouddefense.ai/tools/code-checker/python)
 
 #Check 2
